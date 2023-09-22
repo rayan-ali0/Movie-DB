@@ -58,28 +58,43 @@ app.get(`/search`, (req, res) => {
 // })
 
 app.get(`/movies/add`, (req, res) => {
-    let {title,year,rating=4} =req.query;
-    if(!title || !year || year.length!==4 || isNaN(year)){
-        res.status(403).json({status:403,error:true,message:'you cannot create a movie without providing a tiltle and a year'})
-    }else {
-    movies.push({title:title,year:year,rating:rating});
-    res.json(movies);}
+    let { title, year, rating = 4 } = req.query;
+    if (!title || !year || year.length !== 4 || isNaN(year)) {
+        res.status(403).json({ status: 403, error: true, message: 'you cannot create a movie without providing a tiltle and a year' })
+    } else {
+        movies.push({ title: title, year: year, rating: rating });
+        res.json(movies);
+    }
 
 })
 
-app.get(`/movies/edit`, (req, res) => {
-    res.send(`Update a movie`)
+app.get(`/movies/edit/:ID`, (req, res) => {
+    let { ID } = req.params;
+    let { title, year, rating } = req.query;
+    if (ID > movies.length || ID <= 0 || isNaN(ID)) {
+        res.status(403).json({ status: 403, error: true, message: `The movie ${ID} does not exist` })
+    } else {
+        if (title) movies[ID - 1].title = title;
+        if (rating) movies[ID - 1].rating = rating;
+        if(year){
+        if (year.length !== 4 || isNaN(year)) {
+            res.status(403).json({ status: 403, error: true, message: `Invalid year` })
+        } else
+            movies[ID - 1].year = year;}
+
+        res.json(movies);
+    }
 })
 
 app.get(`/movies/delete/:ID?`, (req, res) => {
-    let {ID} =req.params;
+    let { ID } = req.params;
 
-    if(!ID || ID>movies.length || ID<=0 || isNaN(ID) ){
-        res.status(403).json({status:403,error:true,message:`The movie ${ID} does not exist`})
-    }else {
-     movies.splice(ID- 1, 1);
+    if (!ID || ID > movies.length || ID <= 0 || isNaN(ID)) {
+        res.status(403).json({ status: 403, error: true, message: `The movie ${ID} does not exist` })
+    } else {
+        movies.splice(ID - 1, 1);
         res.json(movies);
-}
+    }
 })
 
 // app.get(`/movies/get`, (req, res) => {
@@ -87,23 +102,23 @@ app.get(`/movies/delete/:ID?`, (req, res) => {
 
 // })
 app.get(`/movies/get/:order?`, (req, res) => {
-    !req.params.order?     res.json({ status: 200, data: movies })
-:
-    req.params.order === "by-date" ?
-        res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.year - movie2.year) }) :
-        req.params.order === "by-rating" ?
-            res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.rating - movie2.rating) }) :
-            req.params.order === "by-title" ?
-                res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.title.localeCompare(movie2.title)) }) :
-                res.send("choose another option")
-    
+    !req.params.order ? res.json({ status: 200, data: movies })
+        :
+        req.params.order === "by-date" ?
+            res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.year - movie2.year) }) :
+            req.params.order === "by-rating" ?
+                res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.rating - movie2.rating) }) :
+                req.params.order === "by-title" ?
+                    res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.title.localeCompare(movie2.title)) }) :
+                    res.send("choose another option")
+
 })
 app.get(`/movies/get/id/:ID`, (req, res) => {
-    let id =req.params.ID;
-    id>movies.length || id<=0 || isNaN(id)? 
-    res.status(404).json({ status: 404, error: true ,message:`the movie ${id} does not exist`})
-    :
-    res.status(200).json({status:200,data:movies[id-1]})
+    let id = req.params.ID;
+    id > movies.length || id <= 0 || isNaN(id) ?
+        res.status(404).json({ status: 404, error: true, message: `the movie ${id} does not exist` })
+        :
+        res.status(200).json({ status: 200, data: movies[id - 1] })
 })
 
 

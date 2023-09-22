@@ -58,7 +58,12 @@ app.get(`/search`, (req, res) => {
 // })
 
 app.get(`/movies/add`, (req, res) => {
-    res.send(`Add a new Movie`)
+    let {title,year,rating=4} =req.query;
+    if(!title || !year || year.length!==4 || isNaN(year)){
+        res.status(403).json({status:403,error:true,message:'you cannot create a movie without providing a tiltle and a year'})
+    }else {
+    movies.push({title:title,year:year,rating:rating});
+    res.json(movies);}
 
 })
 
@@ -70,11 +75,13 @@ app.get(`/movies/delete`, (req, res) => {
     res.send(`Delete a movie`)
 })
 
-app.get(`/movies/get`, (req, res) => {
-    res.json({ status: 200, data: movies })
+// app.get(`/movies/get`, (req, res) => {
+//     res.json({ status: 200, data: movies })
 
-})
+// })
 app.get(`/movies/get/:order?`, (req, res) => {
+    !req.params.order?     res.json({ status: 200, data: movies })
+:
     req.params.order === "by-date" ?
         res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.year - movie2.year) }) :
         req.params.order === "by-rating" ?
@@ -91,6 +98,9 @@ app.get(`/movies/get/id/:ID`, (req, res) => {
     :
     res.status(200).json({status:200,data:movies[id-1]})
 })
+
+
+
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })

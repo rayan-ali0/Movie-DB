@@ -72,13 +72,14 @@ app.get(`/movies/edit`, (req, res) => {
 })
 
 app.get(`/movies/delete/:ID?`, (req, res) => {
-    let {ID} =req.query;
+    let {ID} =req.params;
 
     if(!ID || ID>movies.length || ID<=0 || isNaN(ID) ){
-        res.status(403).json({status:403,error:true,message:'you cannot create a movie without providing a tiltle and a year'})
+        res.status(403).json({status:403,error:true,message:`The movie ${ID} does not exist`})
     }else {
-    movies.push({title:title,year:year,rating:rating});
-    res.json(movies);}
+     movies.splice(ID- 1, 1);
+        res.json(movies);
+}
 })
 
 // app.get(`/movies/get`, (req, res) => {

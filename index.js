@@ -81,9 +81,16 @@ app.get(`/movies/get/:order?`, (req, res) => {
             res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.rating - movie2.rating) }) :
             req.params.order === "by-title" ?
                 res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.title.localeCompare(movie2.title)) }) :
-                res.send("choose another order")
- 
- })
+                res.send("choose another option")
+    
+})
+app.get(`/movies/get/id/:ID`, (req, res) => {
+    let id =req.params.ID;
+    id>movies.length || id<=0 || isNaN(id)? 
+    res.status(404).json({ status: 404, error: true ,message:`the movie ${id} does not exist`})
+    :
+    res.status(200).json({status:200,data:movies[id-1]})
+})
 app.listen(port, () => {
     console.log(`app listening on port ${port}`)
 })

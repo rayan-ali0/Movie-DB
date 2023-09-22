@@ -57,7 +57,7 @@ app.get(`/search`, (req, res) => {
 
 // })
 
-app.get(`/movies/add`, (req, res) => {
+app.post(`/movies/add`, (req, res) => {
     let { title, year, rating = 4 } = req.query;
     if (!title || !year || year.length !== 4 || isNaN(year)) {
         res.status(403).json({ status: 403, error: true, message: 'you cannot create a movie without providing a tiltle and a year' })
@@ -68,12 +68,13 @@ app.get(`/movies/add`, (req, res) => {
 
 })
 
-app.get(`/movies/edit/:ID`, (req, res) => {
+app.put(`/movies/edit/:ID`, (req, res) => {
     let { ID } = req.params;
     let { title, year, rating } = req.query;
     if (ID > movies.length || ID <= 0 || isNaN(ID)) {
         res.status(403).json({ status: 403, error: true, message: `The movie ${ID} does not exist` })
     } else {
+        /*in case of Id , I can use movies.findIndex(movie=>movie.id===parseInt(id))*/
         if (title) movies[ID - 1].title = title;
         if (rating) movies[ID - 1].rating = rating;
         if(year){
@@ -86,7 +87,7 @@ app.get(`/movies/edit/:ID`, (req, res) => {
     }
 })
 
-app.get(`/movies/delete/:ID?`, (req, res) => {
+app.delete(`/movies/delete/:ID?`, (req, res) => {
     let { ID } = req.params;
 
     if (!ID || ID > movies.length || ID <= 0 || isNaN(ID)) {

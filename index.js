@@ -40,9 +40,8 @@ app.get(`/movies/:cmd?/:order?`, (req, res) => {
                 cmd === "delete" ?
                     res.send(`Delete a movie`) :
                     cmd === "get" ?
-                    !req.params.order ?   /**********/ 
+                    !req.params.order ?   
                          res.json({ status: 200, data: movies }) :
-                          // if no  
                           req.params.order === "by-date" ?
                              res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.year - movie2.year) }) :
                              req.params.order === "by-rating" ?

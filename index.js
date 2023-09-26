@@ -1,12 +1,39 @@
 const express = require('express')
+require('dotenv').config();
 const app = express()
-const port = 3000
+const port = process.env.PORT
+const movieModel = require("./models/movie")
+
+// require the mangoose package
+const mongoose = require("mongoose")
+mongoose.set("strictQuery", false);
+const mongoDB = process.env.MONGO_DB;
+// main().catch((err)=> console.log(err));
+
+// async function main(){
+//     await mongoose.connect(mongoDB)
+// }
+mongoose.connect(mongoDB)
+    .then(() => {
+        app.listen(port, () => {
+            console.log(`connected & listening on port ${port}`)
+        })
+    })
+    .catch((error) => {
+        console.log(error)
+    }
+
+    )
+
+
 const movies = [
     { title: 'Jaws', year: 1975, rating: 8 },
     { title: 'Avatar', year: 2009, rating: 7.8 },
     { title: 'Brazil', year: 1985, rating: 8 },
     { title: 'الإرهاب و الكباب ', year: 1992, rating: 6.2 }
 ]
+
+
 
 app.get('/', (req, res) => {
     res.send("OK!")
@@ -57,14 +84,20 @@ app.get(`/search`, (req, res) => {
 
 // })
 
-app.post(`/movies/add`, (req, res) => {
-    let { title, year, rating = 4 } = req.query;
-    if (!title || !year || year.length !== 4 || isNaN(year)) {
-        res.status(403).json({ status: 403, error: true, message: 'you cannot create a movie without providing a tiltle and a year' })
-    } else {
-        movies.push({ title: title, year: year, rating: rating });
-        res.json(movies);
+app.post(`/movies/add`, async (req, res) => {
+    let { title, year, rating } = req.query;
+    try {
+        const newMovie = await movieModel.create({ title, year, rating });
+        res.status(200).json(newMovie);
+    } catch (error) {
+        res.status(400).json({ error: error.message })
     }
+    // if (!title || !year || year.length !== 4 || isNaN(year)) {
+    //     res.status(403).json({ status: 403, error: true, message: 'you cannot create a movie without providing a tiltle and a year' })
+    // } else {
+    //     movies.push({ title: title, year: year, rating: rating });
+    //     res.json(movies);
+    // }
 
 })
 
@@ -77,11 +110,12 @@ app.put(`/movies/edit/:ID`, (req, res) => {
         /*in case of Id , I can use movies.findIndex(movie=>movie.id===parseInt(id))*/
         if (title) movies[ID - 1].title = title;
         if (rating) movies[ID - 1].rating = rating;
-        if(year){
-        if (year.length !== 4 || isNaN(year)) {
-            res.status(403).json({ status: 403, error: true, message: `Invalid year` })
-        } else
-            movies[ID - 1].year = year;}
+        if (year) {
+            if (year.length !== 4 || isNaN(year)) {
+                res.status(403).json({ status: 403, error: true, message: `Invalid year` })
+            } else
+                movies[ID - 1].year = year;
+        }
 
         res.json(movies);
     }
@@ -124,6 +158,3 @@ app.get(`/movies/get/id/:ID`, (req, res) => {
 
 
 
-app.listen(port, () => {
-    console.log(`app listening on port ${port}`)
-})

@@ -85,16 +85,17 @@ app.delete("/users/delete/:username",(req,res)=>{
 })
 
 function isAuthenticated(req,res,next){
-    const auth=req.headers.authorization
-    const index=users.findIndex((user)=>user.username===auth && user.password===auth)
+   let userName=req.headers.username;
+    let password=req.headers.password;
+    const index=users.findIndex((user)=>user.username===userName && user.password===password)
+    
 if(index!==-1){
 next();
 }
 else{
-    res.status(401).Json({error:"Access Forbidden"})
+    res.status(401).json({error:"Access Forbidden"})
 }
 }
-
 
 app.get('/movies/get', movieController.get)
 

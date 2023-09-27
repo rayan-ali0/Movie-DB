@@ -53,16 +53,18 @@ app.get(`/search`, (req, res) => {
 })
 
 
-app.get("/movies",(req,res)=>
-res.json(movies))
-app.get(`/movies/get/:order`, movieController.getByOrder)
+app.get("/movies", (req, res) => res.json(movies))
 
 app.get('/movies/get', movieController.get)
+
+app.get(`/movies/get/:order`, movieController.getByOrder)
+
 app.get(`/movies/get/id/:ID`, movieController.getById)
 
-app.delete('movies/delete/:ID?', movieController.deletById)
-
 app.post("/movies/add", movieController.add);
+
+app.delete('/movies/delete/:ID', movieController.deleteById)
+
 app.put("/movies/edit/:ID", movieController.editById)
 
 

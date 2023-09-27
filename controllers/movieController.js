@@ -1,7 +1,7 @@
 const movieModel = require("../models/movie")
 
-module.exports = (movies) => {
-    return {
+module.exports = {
+    
         get: async (req, res) => {
             try {
                 const movies = await movieModel.find();
@@ -90,4 +90,3 @@ module.exports = (movies) => {
 
 
     }
-}

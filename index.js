@@ -19,14 +19,14 @@ mongoose.connect(mongoDB)
     }
 
     )
-const movies = [
-    { title: 'Jaws', year: 1975, rating: 8 },
-    { title: 'Avatar', year: 2009, rating: 7.8 },
-    { title: 'Brazil', year: 1985, rating: 8 },
-    { title: 'الإرهاب و الكباب ', year: 1992, rating: 6.2 }
-]
+// const movies = [
+//     { title: 'Jaws', year: 1975, rating: 8 },
+//     { title: 'Avatar', year: 2009, rating: 7.8 },
+//     { title: 'Brazil', year: 1985, rating: 8 },
+//     { title: 'الإرهاب و الكباب ', year: 1992, rating: 6.2 }
+// ]
 
-const movieController = require('./controllers/movieController')(movies);
+const movieController = require('./controllers/movieController');
 
 
 app.get('/', (req, res) => {

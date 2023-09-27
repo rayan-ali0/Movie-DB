@@ -2,17 +2,12 @@ const express = require('express')
 require('dotenv').config();
 const app = express()
 const port = process.env.PORT
-const movieModel = require("./models/movie")
-
+// const movieModel = require("./models/movie") 
 // require the mangoose package
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 const mongoDB = process.env.MONGO_DB;
-// main().catch((err)=> console.log(err));
 
-// async function main(){
-//     await mongoose.connect(mongoDB)
-// }
 mongoose.connect(mongoDB)
     .then(() => {
         app.listen(port, () => {
@@ -24,8 +19,6 @@ mongoose.connect(mongoDB)
     }
 
     )
-
-
 const movies = [
     { title: 'Jaws', year: 1975, rating: 8 },
     { title: 'Avatar', year: 2009, rating: 7.8 },
@@ -33,6 +26,7 @@ const movies = [
     { title: 'الإرهاب و الكباب ', year: 1992, rating: 6.2 }
 ]
 
+const movieController = require('./controllers/movieController')(movies);
 
 
 app.get('/', (req, res) => {
@@ -57,6 +51,22 @@ app.get(`/search`, (req, res) => {
     search ? res.json({ status: 200, message: "ok", data: search }) :
         res.status(500).json({ status: 500, error: true, message: "you have to provide a search" })
 })
+
+
+app.get("/movies",(req,res)=>
+res.json(movies))
+app.get(`/movies/get/:order`, movieController.getByOrder)
+
+app.get('/movies/get', movieController.get)
+app.get(`/movies/get/id/:ID`, movieController.getById)
+
+app.delete('movies/delete/:ID?', movieController.deletById)
+
+app.post("/movies/add", movieController.add);
+app.put("/movies/edit/:ID", movieController.editById)
+
+
+
 // app.get(`/movies/:cmd?/:order?`, (req, res) => {
 //     let cmd = req.params.cmd;
 //     cmd ? /*  */
@@ -80,81 +90,71 @@ app.get(`/search`, (req, res) => {
 //                   res.send(`please insert a valid command`) : 
 //                   res.send(`Error`) 
 
+// })
 
+//Done--------------------
+
+// app.post(`/movies/add`, async (req, res) => {
+//     let { title, year, rating } = req.query;
+//     try {
+//         const newMovie = await movieModel.create({ title, year, rating });
+//         res.status(200).json(newMovie);
+//     } catch (error) {
+//         res.status(400).json({ error: error.message })
+//     }
+//     // if (!title || !year || year.length !== 4 || isNaN(year)) {
+//     //     res.status(403).json({ status: 403, error: true, message: 'you cannot create a movie without providing a tiltle and a year' })
+//     // } else {
+//     //     movies.push({ title: title, year: year, rating: rating });
+//     //     res.json(movies);
+//     // }
 
 // })
 
-app.post(`/movies/add`, async (req, res) => {
-    let { title, year, rating } = req.query;
-    try {
-        const newMovie = await movieModel.create({ title, year, rating });
-        res.status(200).json(newMovie);
-    } catch (error) {
-        res.status(400).json({ error: error.message })
-    }
-    // if (!title || !year || year.length !== 4 || isNaN(year)) {
-    //     res.status(403).json({ status: 403, error: true, message: 'you cannot create a movie without providing a tiltle and a year' })
-    // } else {
-    //     movies.push({ title: title, year: year, rating: rating });
-    //     res.json(movies);
-    // }
+// app.put(`/movies/edit/:ID`, (req, res) => {
+//     let { ID } = req.params;
+//     let { title, year, rating } = req.query;
+//     if (ID > movies.length || ID <= 0 || isNaN(ID)) {
+//         res.status(403).json({ status: 403, error: true, message: `The movie ${ID} does not exist` })
+//     } else {
+//         /*in case of Id , I can use movies.findIndex(movie=>movie.id===parseInt(id))*/
+//         if (title) movies[ID - 1].title = title;
+//         if (rating) movies[ID - 1].rating = rating;
+//         if (year) {
+//             if (year.length !== 4 || isNaN(year)) {
+//                 res.status(403).json({ status: 403, error: true, message: `Invalid year` })
+//             } else
+//                 movies[ID - 1].year = year;
+//         }
 
-})
+//         res.json(movies);
+//     }
+// })
 
-app.put(`/movies/edit/:ID`, (req, res) => {
-    let { ID } = req.params;
-    let { title, year, rating } = req.query;
-    if (ID > movies.length || ID <= 0 || isNaN(ID)) {
-        res.status(403).json({ status: 403, error: true, message: `The movie ${ID} does not exist` })
-    } else {
-        /*in case of Id , I can use movies.findIndex(movie=>movie.id===parseInt(id))*/
-        if (title) movies[ID - 1].title = title;
-        if (rating) movies[ID - 1].rating = rating;
-        if (year) {
-            if (year.length !== 4 || isNaN(year)) {
-                res.status(403).json({ status: 403, error: true, message: `Invalid year` })
-            } else
-                movies[ID - 1].year = year;
-        }
 
-        res.json(movies);
-    }
-})
+// app.delete(`/movies/delete/:ID?`, (req, res) => {
+//     let { ID } = req.params;
 
-app.delete(`/movies/delete/:ID?`, (req, res) => {
-    let { ID } = req.params;
+//     if (!ID || ID > movies.length || ID <= 0 || isNaN(ID)) {
+//         res.status(403).json({ status: 403, error: true, message: `The movie ${ID} does not exist` })
+//     } else {
+//         movies.splice(ID - 1, 1);
+//         res.json(movies);
+//     }
+// }
+// )
 
-    if (!ID || ID > movies.length || ID <= 0 || isNaN(ID)) {
-        res.status(403).json({ status: 403, error: true, message: `The movie ${ID} does not exist` })
-    } else {
-        movies.splice(ID - 1, 1);
-        res.json(movies);
-    }
-})
-
-// app.get(`/movies/get`, (req, res) => {
-//     res.json({ status: 200, data: movies })
+// app.get(`/movies/get/:order?`, (req, res) => {
+//     !req.params.order ? res.json({ status: 200, data: movies })
+//         :
+//         req.params.order === "by-date" ?
+//             res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.year - movie2.year) }) :
+//             req.params.order === "by-rating" ?
+//                 res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.rating - movie2.rating) }) :
+//                 req.params.order === "by-title" ?
+//                     res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.title.localeCompare(movie2.title)) }) :
+//                     res.send("choose another option")
 
 // })
-app.get(`/movies/get/:order?`, (req, res) => {
-    !req.params.order ? res.json({ status: 200, data: movies })
-        :
-        req.params.order === "by-date" ?
-            res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.year - movie2.year) }) :
-            req.params.order === "by-rating" ?
-                res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.rating - movie2.rating) }) :
-                req.params.order === "by-title" ?
-                    res.json({ status: 200, data: movies.sort((movie1, movie2) => movie1.title.localeCompare(movie2.title)) }) :
-                    res.send("choose another option")
-
-})
-app.get(`/movies/get/id/:ID`, (req, res) => {
-    let id = req.params.ID;
-    id > movies.length || id <= 0 || isNaN(id) ?
-        res.status(404).json({ status: 404, error: true, message: `the movie ${id} does not exist` })
-        :
-        res.status(200).json({ status: 200, data: movies[id - 1] })
-})
-
 
 

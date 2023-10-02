@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express') // require is just for ES5 for ES6 we just use import
 require('dotenv').config();
 const app = express()
 const port = process.env.PORT
@@ -26,6 +26,7 @@ const users = [
 
 ];
 
+app.use(express.json);
 
 
 app.get('/', (req, res) => {
@@ -49,6 +50,7 @@ app.get(`/search`, (req, res) => {
     let search = req.query.s;// I put .s in order to take just the variable s in the url if I used req.query it will take all variable in the url and put them in an object
     search ? res.json({ status: 200, message: "ok", data: search }) :
         res.status(500).json({ status: 500, error: true, message: "you have to provide a search" })
+        //500 means internel server errors
 })
 
 
